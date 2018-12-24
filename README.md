@@ -82,5 +82,45 @@ note: here we are performing some ansible tasks so we should keept ssh ports ope
 ![login of instance -1](https://user-images.githubusercontent.com/44922458/50394991-5801c080-0787-11e9-82f7-656c86a45a4a.PNG)
 
 
+#STAGE-2
+
+--> INSTALLING ANSIBLE IN ONE INSTANCE & LINKING OF SECOND INSTANCE THROUGH ANSIBLE HOSTS
+
+#Step-1: Open one instane (i.e MSR-test-Instance-1)
+--> change hostname as MSR1 for identification purpose (cmd--> sudo hostname MSR1 --> exec bash)
+
+#Step-2: Installing Ansible in MSR1 instance
+--> following commands for installing ansible:
+-->sudo apt-get update
+-->sudo apt-get install ansible
+checking ansible version --> ansible --version
+
+![ansible installation](https://user-images.githubusercontent.com/44922458/50397818-f4808e80-0798-11e9-9b30-172440a89934.PNG)
+
+#Step-3: Open other instance (MSR-test-Instance-2) in the similiar way described in STAGE-1 (step 14 & 15) & change the hostname similarly as shown as above)
+
+#Step-4: Go to instance-1 (MSR-1) and change to root with cmd ($ sudo -i) and generate ssh-keys by using command $ ssh-keygen
+
+#Step-5: Now we have go to path /root/.ssh, there we will find public keys, copy public key (id_rsa.pub) and paste in authorized keys file of both instances (i.e MSR1 & MSR2)
+
+#Step-6: Now go to ansible path (i.e /etc/ansible) there you will find hosts file edit that file and add PUBLIC IP of second instance and localhost also.
+
+![hosts adding](https://user-images.githubusercontent.com/44922458/50398364-f9474180-079c-11e9-8350-5df4f042d336.PNG)
+
+
+#STAGE-3 --> CHECKING FOR HOST CONNECTIONS
+
+#Step-1: Be sure that you have installed Python in second instance
+         Installation: $ sudo apt-get update & $ sudo apt-get install python
+        
+#Step-2: Now go to MSR1 instance (i.e where we have installed Ansible) and type cmd $ ansible -m ping all, then we can see a message like this
+
+![checking connections](https://user-images.githubusercontent.com/44922458/50398652-41fffa00-079f-11e9-8b9e-1fb73920809f.PNG)
+
+
+
+
+
+
 
 
