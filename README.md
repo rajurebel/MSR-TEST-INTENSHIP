@@ -82,14 +82,19 @@ note: here we are performing some ansible tasks so we should keept ssh ports ope
 ![login of instance -1](https://user-images.githubusercontent.com/44922458/50394991-5801c080-0787-11e9-82f7-656c86a45a4a.PNG)
 
 
-#STAGE-2
+# STAGE-2
 
 --> INSTALLING ANSIBLE IN ONE INSTANCE & LINKING OF SECOND INSTANCE THROUGH ANSIBLE HOSTS
+------------------------------------------------------------------------------------------
 
-#Step-1: Open one instane (i.e MSR-test-Instance-1)
+#Step-1:
+-------
+Open one instane (i.e MSR-test-Instance-1)
 --> change hostname as MSR1 for identification purpose (cmd--> sudo hostname MSR1 --> exec bash)
 
-#Step-2: Installing Ansible in MSR1 instance
+#Step-2:
+--------
+Installing Ansible in MSR1 instance
 --> following commands for installing ansible:
 -->sudo apt-get update
 -->sudo apt-get install ansible
@@ -97,30 +102,164 @@ checking ansible version --> ansible --version
 
 ![ansible installation](https://user-images.githubusercontent.com/44922458/50397818-f4808e80-0798-11e9-9b30-172440a89934.PNG)
 
-#Step-3: Open other instance (MSR-test-Instance-2) in the similiar way described in STAGE-1 (step 14 & 15) & change the hostname similarly as shown as above)
+#Step-3:
+--------
+Open other instance (MSR-test-Instance-2) in the similiar way described in STAGE-1 (step 14 & 15) & change the hostname similarly as shown as above)
 
-#Step-4: Go to instance-1 (MSR-1) and change to root with cmd ($ sudo -i) and generate ssh-keys by using command $ ssh-keygen
+#Step-4:
+--------
+Go to instance-1 (MSR-1) and change to root with cmd ($ sudo -i) and generate ssh-keys by using command $ ssh-keygen
 
-#Step-5: Now we have go to path /root/.ssh, there we will find public keys, copy public key (id_rsa.pub) and paste in authorized keys file of both instances (i.e MSR1 & MSR2)
+#Step-5:
+--------
+Now we have go to path /root/.ssh, there we will find public keys, copy public key (id_rsa.pub) and paste in authorized keys file of both instances (i.e MSR1 & MSR2)
 
-#Step-6: Now go to ansible path (i.e /etc/ansible) there you will find hosts file edit that file and add PUBLIC IP of second instance and localhost also.
+#Step-6:
+--------
+Now go to ansible path (i.e /etc/ansible) there you will find hosts file edit that file and add PUBLIC IP of second instance and localhost also.
 
 ![hosts adding](https://user-images.githubusercontent.com/44922458/50398364-f9474180-079c-11e9-8350-5df4f042d336.PNG)
 
 
-#STAGE-3 --> CHECKING FOR HOST CONNECTIONS
+# STAGE-3 --> CHECKING FOR HOST CONNECTIONS
 
-#Step-1: Be sure that you have installed Python in second instance
+#Step-1:
+--------
+         Be sure that you have installed Python in second instance
          Installation: $ sudo apt-get update & $ sudo apt-get install python
         
-#Step-2: Now go to MSR1 instance (i.e where we have installed Ansible) and type cmd $ ansible -m ping all, then we can see a message like this
+#Step-2:
+--------
+Now go to MSR1 instance (i.e where we have installed Ansible) and type cmd $ ansible -m ping all, then we can see a message like this
 
 ![checking connections](https://user-images.githubusercontent.com/44922458/50398652-41fffa00-079f-11e9-8b9e-1fb73920809f.PNG)
 
 
+# STAGE-4 --> INSTALLING SOFTWARES
+
+#Step-1: --> Installing GIT
+---------------------------
+  --> Create a playbook for installing Git in MSR1 Instances
+    
+   ![git playbook](https://user-images.githubusercontent.com/44922458/50399285-4c70c280-07a4-11e9-809a-e2cc375c3559.PNG)
+    
+  --> Run Playbook with command $ ansible-playbook git-playbook.yml  and the result is
+    
+   ![git playbook -result](https://user-images.githubusercontent.com/44922458/50399330-af625980-07a4-11e9-8740-448a33cd0270.PNG)
+    
+  --> git version installed is 2.7.4
+  
+#Step-2: --> Installing DOCKER
+------------------------------
+--> Create a playbook for installing Docker in MSR1 Instance
+
+****
+---
+- hosts: all
+  become: true
+  tasks:
+- name: Add Docker GPG key
+    apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+
+  - name: Add Docker APT repository
+    apt_repository:
+      repo: deb [arch=amd64] https:https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+  - name: Install list of packages
+    apt:
+      name: ['apt-transport-https','ca-certificates','curl','software-properties-common','docker-ce']
+      state: present
+      update_cache: yes
+****
+--> Run Playbook with command $ ansible-playbook docker-playbook.yml and the version of Docker is  18.09
 
 
+#Step-3: --> Installing Docker-Compose
+--------------------------------------
+--> Create a playbook for Docker compose as follows
 
+*****
+---
+- hosts: all
+  become: true
+  tasks:
+  - name - name: Install Docker Compose (Docker-complex)
+    get_url:
+       url: https://github.com/docker/compose/releases/download/1.23.2/docker-compose-Linux-x86_64
+       dest: /usr/local/bin/docker-compose
+       mode: 4777
+  ****
+  --> run the playbook using command ansible-playbook docker-compose.yml
+  and the version of docker-compose is docker-compose version 1.23.2, build 1110ad01
 
+ #Step:4: Installing Node 8.12.0 
+ -------------------------------
+ --> Create a playbook for installing Node 8.12.0 in ansible installed instance
+*****
+ - name: nodejs 8.12
+    get_url:
+      url=https://nodejs.org/dist/v8.12.0/node-v8.12.0.tar.gz
+      dest=/opt
 
+  - name: Extract node tar.xz
+    unarchive:
+      src: /opt/node-v8.12.0-linux-x64.tar.xz
+      dest: /opt/riyaz
+      remote_src: yes
+      
+  - name: Rename
+    command: mv /opt/riyaz/node-v8.12.0 /opt/node-v8
+  - name: create 'nodejs-env.sh' 
+    file: path=/etc/profile.d/nodejs-env.sh state=touch owner=root group=sys mode=0555
 
+  - name: ensure file exists
+     copy:
+     dest: /etc/profile.d/nodejs-env.sh/   
+     content:
+        export NODEJS_HOME=/etc/node/node-v8.12.0/bin
+        export PATH=/etc/node/node-v8.12.0/bin:/etc/node/node-v8.12.0
+ *****
+--> run the playbook using command ansible-playbook node-playbook.yml
+  and the version of node is 8.12.0
+  
+ #Step-5: Installing NVM 0.33.2
+ ------------------------------
+--> Create a Playbook for installing NVM
+****
+- hosts: all
+  roles:
+    - role: ansible-role-nvm
+      nodejs_version: "0.33.2"
+****
+--> run the playbook using command ansible-playbook nvm.yml
+  and the version of nvm is 0.33.2
+  
+ #Step-6: Installing OpenSSL
+ --------------------------
+ --> Create a Playbook for installing OPENSSL
+****
+---
+- hosts: all
+  become: true
+  tasks:
+  - name: installig open ssl
+    get_url:
+      url: https://www.openssl.org/source/openssl-1.1.1a.tar.gz
+      dest: /usr/src
+  - name: urarcheiving
+    unarchive:
+           src: /usr/src/openssl-1.1.1a.tar.gz
+           dest: /usr/src/
+  - name: Shell commands
+    shell:
+    args:
+     chdir: /usr/src/openssl-1.1.1a
+     executable:
+         ./config
+         make
+         make_test
+         make install
+
+****
+--> run the playbook using command ansible-playbook ssl.yml
+  and the version of 1.1.1a
+   
