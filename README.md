@@ -1,6 +1,6 @@
 # MSR-TEST-INTENSHIP
 
-# LETS DIVIDE THE TOTAL PROJECT INTO N NUMBER OF STAGES
+# LETS DIVIDE THE TOTAL PROJECT INTO 4 NUMBER OF STAGES
 
 # STAGE-1
 
@@ -141,7 +141,12 @@ Now go to MSR1 instance (i.e where we have installed Ansible) and type cmd $ ans
 ---------------------------
   --> Create a playbook for installing Git in MSR1 Instances
     
-   ![git playbook](https://user-images.githubusercontent.com/44922458/50399285-4c70c280-07a4-11e9-809a-e2cc375c3559.PNG)
+   ---
+   - hosts: all
+     become: true
+     tasks:
+     - name: installing GIT
+       apt: name=git state=present update_cache=yes
     
   --> Run Playbook with command $ ansible-playbook git-playbook.yml  and the result is
     
@@ -154,21 +159,21 @@ Now go to MSR1 instance (i.e where we have installed Ansible) and type cmd $ ans
 --> Create a playbook for installing Docker in MSR1 Instance
 
 ****
----
-- hosts: all
-  become: true
-  tasks:
-- name: Add Docker GPG key
-    apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+      ---
+      - hosts: all
+        become: true
+        tasks:
+      - name: Add Docker GPG key
+          apt_key: url=https://download.docker.com/linux/ubuntu/gpg
 
-  - name: Add Docker APT repository
-    apt_repository:
-      repo: deb [arch=amd64] https:https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-  - name: Install list of packages
-    apt:
-      name: ['apt-transport-https','ca-certificates','curl','software-properties-common','docker-ce']
-      state: present
-      update_cache: yes
+        - name: Add Docker APT repository
+          apt_repository:
+            repo: deb [arch=amd64] https:https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+        - name: Install list of packages
+          apt:
+            name: ['apt-transport-https','ca-certificates','curl','software-properties-common','docker-ce']
+            state: present
+            update_cache: yes
 ****
 --> Run Playbook with command $ ansible-playbook docker-playbook.yml and the version of Docker is  18.09
 
@@ -178,15 +183,15 @@ Now go to MSR1 instance (i.e where we have installed Ansible) and type cmd $ ans
 --> Create a playbook for Docker compose as follows
 
 *****
----
-- hosts: all
-  become: true
-  tasks:
-  - name - name: Install Docker Compose (Docker-complex)
-    get_url:
-       url: https://github.com/docker/compose/releases/download/1.23.2/docker-compose-Linux-x86_64
-       dest: /usr/local/bin/docker-compose
-       mode: 4777
+      ---
+      - hosts: all
+        become: true
+        tasks:
+        - name - name: Install Docker Compose (Docker-complex)
+          get_url:
+             url: https://github.com/docker/compose/releases/download/1.23.2/docker-compose-Linux-x86_64
+             dest: /usr/local/bin/docker-compose
+             mode: 4777
   ****
   --> run the playbook using command ansible-playbook docker-compose.yml
   and the version of docker-compose is docker-compose version 1.23.2, build 1110ad01
@@ -195,28 +200,32 @@ Now go to MSR1 instance (i.e where we have installed Ansible) and type cmd $ ans
  -------------------------------
  --> Create a playbook for installing Node 8.12.0 in ansible installed instance
 *****
- - name: nodejs 8.12
-    get_url:
-      url=https://nodejs.org/dist/v8.12.0/node-v8.12.0.tar.gz
-      dest=/opt
+      ---
+      - hosts: all
+        become: true
+        tasks: 
+       - name: nodejs 8.12
+          get_url:
+            url=https://nodejs.org/dist/v8.12.0/node-v8.12.0.tar.gz
+            dest=/opt
 
-  - name: Extract node tar.xz
-    unarchive:
-      src: /opt/node-v8.12.0-linux-x64.tar.xz
-      dest: /opt/riyaz
-      remote_src: yes
-      
-  - name: Rename
-    command: mv /opt/riyaz/node-v8.12.0 /opt/node-v8
-  - name: create 'nodejs-env.sh' 
-    file: path=/etc/profile.d/nodejs-env.sh state=touch owner=root group=sys mode=0555
+        - name: Extract node tar.xz
+          unarchive:
+            src: /opt/node-v8.12.0-linux-x64.tar.xz
+            dest: /opt/riyaz
+            remote_src: yes
 
-  - name: ensure file exists
-     copy:
-     dest: /etc/profile.d/nodejs-env.sh/   
-     content:
-        export NODEJS_HOME=/etc/node/node-v8.12.0/bin
-        export PATH=/etc/node/node-v8.12.0/bin:/etc/node/node-v8.12.0
+        - name: Rename
+          command: mv /opt/riyaz/node-v8.12.0 /opt/node-v8
+        - name: create 'nodejs-env.sh' 
+          file: path=/etc/profile.d/nodejs-env.sh state=touch owner=root group=sys mode=0555
+
+        - name: ensure file exists
+           copy:
+           dest: /etc/profile.d/nodejs-env.sh/   
+           content:
+              export NODEJS_HOME=/etc/node/node-v8.12.0/bin
+              export PATH=/etc/node/node-v8.12.0/bin:/etc/node/node-v8.12.0
  *****
 --> run the playbook using command ansible-playbook node-playbook.yml
   and the version of node is 8.12.0
@@ -225,10 +234,11 @@ Now go to MSR1 instance (i.e where we have installed Ansible) and type cmd $ ans
  ------------------------------
 --> Create a Playbook for installing NVM
 ****
-- hosts: all
-  roles:
-    - role: ansible-role-nvm
-      nodejs_version: "0.33.2"
+      ---
+      - hosts: all
+        roles:
+          - role: ansible-role-nvm
+            nodejs_version: "0.33.2"
 ****
 --> run the playbook using command ansible-playbook nvm.yml
   and the version of nvm is 0.33.2
@@ -237,27 +247,27 @@ Now go to MSR1 instance (i.e where we have installed Ansible) and type cmd $ ans
  --------------------------
  --> Create a Playbook for installing OPENSSL
 ****
----
-- hosts: all
-  become: true
-  tasks:
-  - name: installig open ssl
-    get_url:
-      url: https://www.openssl.org/source/openssl-1.1.1a.tar.gz
-      dest: /usr/src
-  - name: urarcheiving
-    unarchive:
-           src: /usr/src/openssl-1.1.1a.tar.gz
-           dest: /usr/src/
-  - name: Shell commands
-    shell:
-    args:
-     chdir: /usr/src/openssl-1.1.1a
-     executable:
-         ./config
-         make
-         make_test
-         make install
+      ---
+      - hosts: all
+        become: true
+        tasks:
+        - name: installig open ssl
+          get_url:
+            url: https://www.openssl.org/source/openssl-1.1.1a.tar.gz
+            dest: /usr/src
+        - name: urarcheiving
+          unarchive:
+               src: /usr/src/openssl-1.1.1a.tar.gz
+               dest: /usr/src/
+        - name: Shell commands
+          shell:
+          args:
+           chdir: /usr/src/openssl-1.1.1a
+           executable:
+               ./config
+               make
+               make_test
+               make install
 
 ****
 --> run the playbook using command ansible-playbook ssl.yml
