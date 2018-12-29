@@ -12,8 +12,8 @@
    - ec2:
       key_name: raju   #that key pair should be already downloaded in your aws
       ec2_region: us-east-1  #preferred
-      ec2_access_key: AKIAJ5XRHPIAMUMSPHVQ  # key should be geerated
-      ec2_secret_key: Mgzn0UuAIbH6PaDei5fdGZcpwfc+XjPwpqcQB8KU # key should be geerated
+      ec2_access_key: XXXXXXXXXXXXXXXXXXXXX # key should be geerated
+      ec2_secret_key: XXXXXXXXXXXXXXXXXXXXXXXXXXX # key should be geerated
       instance_type: t2.micro
       image: ami-009d6802948d06e52 # will vary with respect to zones
       wait: yes
