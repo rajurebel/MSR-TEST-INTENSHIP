@@ -1,0 +1,24 @@
+- hosts: all
+  become: true
+  tasks:
+  - name: download 
+    get_url:
+      url: https://nodejs.org/dist/v8.12.0/node-v8.12.0-linux-x64.tar.xz
+      dest: /etc/node/
+      mode: 4777
+  - name: archeiving
+    unarchive:
+      src: /etc/node/node-v8.12.0-linux-x64.tar.xz
+      dest: /etc/node
+  - name:renaming
+    command: mv /etc/node/node-v8.12.0-linux-x64 /etc/node/node-v8.12.0  
+  - name: creating a empty folder
+    file:
+      path: "/etc/profile.d/nodejs-env.sh"
+      state: touch  
+	 - name: Ansible create file with content example
+    copy:
+      dest: "/etc/profile.d/nodejs-env.sh"
+      content:
+        export NODEJS_HOME=/etc/node/node-v8.12.0/bin
+        export PATH=/etc/node/node-v8.12.0/bin:/etc/node/node-v8.12.0
