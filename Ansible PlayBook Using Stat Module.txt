@@ -1,0 +1,14 @@
+---
+- hosts: ubuntu
+  become: true
+  tasks:
+  - name: checking for file existance
+    stat:
+     path: /var/raju.txt
+    register: result  
+  - name: copying file
+    copy:
+     src: /var/playbooks/raju.txt
+     dest: /var/raju.txt
+    when: result is success # result is success in the sense that file is not there in that folder  here we can result is failed
+
