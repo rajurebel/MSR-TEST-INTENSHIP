@@ -274,3 +274,4 @@ Now go to MSR1 instance (i.e where we have installed Ansible) and type cmd $ ans
   and the version of 1.1.1a
    
 end of the task
+Hello
