@@ -273,3 +273,4 @@ Now go to MSR1 instance (i.e where we have installed Ansible) and type cmd $ ans
 --> run the playbook using command ansible-playbook ssl.yml
   and the version of 1.1.1a
    
+end of the task
