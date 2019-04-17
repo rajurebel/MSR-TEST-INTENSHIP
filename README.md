@@ -275,3 +275,4 @@ Now go to MSR1 instance (i.e where we have installed Ansible) and type cmd $ ans
    
 end of the task
 Hello
+commit changes
